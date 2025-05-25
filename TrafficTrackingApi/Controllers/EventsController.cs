@@ -21,12 +21,22 @@ namespace TrafficTrackingApi.Controllers
             _context = context;
         }
 
-        // GET: api/Events
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Event>>> GetEvents()
+        // GET: api/Events/intersection/{intersectionId}
+        [HttpGet("intersection/{intersectionId}")]
+        public async Task<ActionResult<IEnumerable<Event>>> GetEventsByIntersection(int intersectionId)
         {
-            return await _context.Events.ToListAsync();
+            var events = await _context.Events
+                .Where(e => e.Intersections.Any(i => i.IntersectionId == intersectionId))
+                .ToListAsync();
+
+            if (events == null || !events.Any())
+            {
+                return NotFound();
+            }
+
+            return Ok(events);
         }
+
 
         // GET: api/Events/5
         [HttpGet("{id}")]

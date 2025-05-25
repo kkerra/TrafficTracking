@@ -21,13 +21,6 @@ namespace TrafficTrackingApi.Controllers
             _context = context;
         }
 
-        // GET: api/TrafficLights
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<TrafficLight>>> GetTrafficLights()
-        {
-            return await _context.TrafficLights.ToListAsync();
-        }
-
         // GET: api/TrafficLights/5
         [HttpGet("{id}")]
         public async Task<ActionResult<TrafficLight>> GetTrafficLight(int id)
@@ -40,6 +33,21 @@ namespace TrafficTrackingApi.Controllers
             }
 
             return trafficLight;
+        }
+
+        [HttpGet("intersection/{intersectionId}")]
+        public async Task<ActionResult<IEnumerable<TrafficLight>>> GetTrafficLightsByIntersection(int intersectionId)
+        {
+            var trafficLights = await _context.TrafficLights
+                .Where(tl => tl.IntersectionId == intersectionId)
+                .ToListAsync();
+
+            if (trafficLights == null || !trafficLights.Any())
+            {
+                return NotFound();
+            }
+
+            return Ok(trafficLights);
         }
 
         // PUT: api/TrafficLights/5
