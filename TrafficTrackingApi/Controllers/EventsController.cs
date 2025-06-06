@@ -83,9 +83,8 @@ namespace TrafficTrackingApi.Controllers
             return NoContent();
         }
 
-        // POST: api/Events
         [HttpPost]
-        public async Task<ActionResult<Event>> PostEvent(Event newEvent)
+        public async Task<ActionResult<Event>> PostEvent(Event newEvent, [FromQuery] int intersectionId)
         {
             try
             {
@@ -99,6 +98,14 @@ namespace TrafficTrackingApi.Controllers
                     return BadRequest(ModelState);
                 }
 
+                var intersection = await _context.Intersections.FindAsync(intersectionId);
+                if (intersection == null)
+                {
+                    return NotFound("Перекресток не найден.");
+                }
+
+                newEvent.Intersections.Add(intersection);
+
                 _context.Events.Add(newEvent);
                 await _context.SaveChangesAsync();
 
@@ -110,7 +117,6 @@ namespace TrafficTrackingApi.Controllers
             }
         }
 
-        // DELETE: api/Events/5
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEvent(int id)
         {
